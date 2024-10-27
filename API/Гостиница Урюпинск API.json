@@ -1,0 +1,921 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Гостиница Урюпинск API",
+    "description": "API для управления гостиничным приложением\n\nДанное API предоставляет возможности для взаимодействия с гостиничной системой, включая управление номерами, бронированиями, гостями, услугами и скидками. API ориентировано на работу с административной панелью и автоматизирует процессы, такие как создание, изменение и удаление данных, а также просмотр отчетности и управление услугами.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://gostinitsa_urypinsk.ru",
+      "description": "Основной сервер"
+    }
+  ],
+  "paths": {
+    "/room": {
+      "get": {
+        "tags": [
+          "База номеров"
+        ],
+        "summary": "Получить список всех номеров",
+        "description": "Возвращает список всех номеров с их id, статусом, этажом, количеством спальных мест и категорией.",
+        "responses": {
+          "200": {
+            "description": "Получен список номеров",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Room"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "База номеров"
+        ],
+        "summary": "Добавить новый номер",
+        "description": "Добавляет новый номер в базу данных.",
+        "requestBody": {
+          "required": true,
+          "description": "Создайте новый номер гостиницы",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Room"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Номер успешно создан",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Room"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный ввод данных"
+          }
+        }
+      }
+    },
+    "/room/{room_ID}": {
+      "put": {
+        "tags": [
+          "База номеров"
+        ],
+        "summary": "Редактировать информацию о номере",
+        "description": "Редактирует информацию о конкретном номере",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RoomId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ro_status": {
+                    "$ref": "#/components/parameters/RoomStatus"
+                  },
+                  "ro_category": {
+                    "$ref": "#/components/parameters/RoomCategory"
+                  },
+                  "ro_floor": {
+                    "$ref": "#/components/parameters/RoomFloor"
+                  },
+                  "ro_image": {
+                    "$ref": "#/components/parameters/RoomImage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Информация о номере успешно обновлена"
+          },
+          "400": {
+            "description": "Предоставлен неверный Id номера"
+          },
+          "404": {
+            "description": "Номер не найден"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "База номеров"
+        ],
+        "summary": "Удалить номер",
+        "description": "Удаляет номер по его ID.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RoomId"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Предоставлен неверный Id номера"
+          },
+          "404": {
+            "description": "Номер не найден"
+          }
+        }
+      }
+    },
+    "/room/findByCategory": {
+      "get": {
+        "tags": [
+          "База номеров"
+        ],
+        "summary": "Получить номера с определенной категории",
+        "description": "Возвращает номера с определенной категорией, выберите нужную из выпадающего списка.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RoomCategory"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Возвращает массив номеров, соответствующих критериям поиска",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Room"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Номера не найдены"
+          }
+        }
+      }
+    },
+    "/room/findByStatus": {
+      "get": {
+        "tags": [
+          "База номеров"
+        ],
+        "summary": "Получить номера с определенным статусом",
+        "description": "Возвращает номера с определенным статусом, выберите нужный из выпадающего списка.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RoomStatus"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Возвращает массив номеров, соответствующих критериям поиска",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Room"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Номера не найден"
+          }
+        }
+      }
+    },
+    "/room/findById": {
+      "get": {
+        "tags": [
+          "База номеров"
+        ],
+        "summary": "Получить конкретный номер по идентификатору",
+        "description": "Возвращает нужный номер, найденный по его идентификатору",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RoomId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Информация о номере",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Room"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Предоставлен несуществующий Id номера"
+          },
+          "404": {
+            "description": "Номер не найден"
+          }
+        }
+      }
+    },
+    "/room/findByFloor": {
+      "get": {
+        "tags": [
+          "База номеров"
+        ],
+        "summary": "Получить номера с определенного этажа",
+        "description": "Возвращает номера с определенного этажа гостиницы",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RoomFloor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Возвращает массив номеров, соответствующих критериям поиска",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Room"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Номера не найдены"
+          }
+        }
+      }
+    },
+    "/checkout/phone": {
+      "get": {
+        "tags": [
+          "Выселение"
+        ],
+        "summary": "Получить бронирования и номера гостя",
+        "description": "С помощью номера телефона гостя возвращает его бронирования и номера, в которых он проживал в рамках этих бронирований. Если найдено бронирование с пустым значением bo_ro_id, то вместо номера комнаты нужно выдать \"Номер не назначен\".",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/GuestGuidePhone"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Получены нужные бронирования и номера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Booking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Предоставлен неверный номер телефона гостя"
+          },
+          "404": {
+            "description": "Бронирования и номера не найдены"
+          }
+        }
+      }
+    },
+    "/receipt/phone": {
+      "get": {
+        "tags": [
+          "Счета на оплату"
+        ],
+        "summary": "Получить счета на оплату гостя",
+        "description": "С помощью номера телефона гостя возвращает его счета на оплату.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/GuestGuidePhone"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Получены нужные счета на оплату",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Checks"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Предоставлен неверный номер телефона гостя"
+          },
+          "404": {
+            "description": "Счета на оплату не найдены"
+          }
+        }
+      }
+    },
+    "/room/roomId/image": {
+      "post": {
+        "tags": [
+          "База номеров"
+        ],
+        "summary": "Добавить фотографию номера",
+        "description": "",
+        "operationId": "uploadFile",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RoomId"
+          },
+          {
+            "$ref": "#/components/parameters/RoomImage"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Room": {
+        "type": "object",
+        "properties": {
+          "ro_Id": {
+            "$ref": "#/components/parameters/RoomId"
+          },
+          "ro_floor": {
+            "$ref": "#/components/parameters/RoomFloor"
+          },
+          "ro_status": {
+            "$ref": "#/components/parameters/RoomStatus"
+          },
+          "ro_photo": {
+            "$ref": "#/components/parameters/RoomImage"
+          },
+          "RoomCategory": {
+            "$ref": "#/components/schemas/RoomCategory"
+          }
+        },
+        "required": [
+          "ro_id",
+          "ro_floor",
+          "ro_status",
+          "RoomCategory",
+          "rc_id",
+          "RoomCategoryGuide",
+          "rc_g_id",
+          "rc_g_name"
+        ]
+      },
+      "RoomCategory": {
+        "type": "object",
+        "description": "Уникальный идентификатор категории номера",
+        "properties": {
+          "rc_id": {
+            "$ref": "#/components/parameters/RoomCategoryId"
+          },
+          "hot_id": {
+            "$ref": "#/components/parameters/HotelId"
+          },
+          "RoomCategoryGuide": {
+            "$ref": "#/components/schemas/RoomCategoryGuide"
+          }
+        }
+      },
+      "RoomCategoryGuide": {
+        "type": "object",
+        "description": "Уникальный идентификатор справочника категории номера",
+        "properties": {
+          "rc_g_id": {
+            "$ref": "#/components/parameters/RoomCategoryGuideId"
+          },
+          "rc_g_name": {
+            "$ref": "#/components/parameters/RoomCategoryGuideName"
+          },
+          "rс_g_cost_for_night": {
+            "$ref": "#/components/parameters/RoomCategoryGuideCost"
+          },
+          "rс_g_number_of_beds": {
+            "$ref": "#/components/parameters/RoomCategoryGuideBeds"
+          },
+          "rс_g_description": {
+            "$ref": "#/components/parameters/RoomCategoryGuideDescription"
+          },
+          "rс_g_room_count": {
+            "$ref": "#/components/parameters/RoomCategoryGuideCount"
+          }
+        }
+      },
+      "Booking": {
+        "type": "object",
+        "properties": {
+          "bo_id": {
+            "$ref": "#/components/parameters/BookingId"
+          },
+          "bo_booking_date": {
+            "$ref": "#/components/parameters/BookingDate"
+          },
+          "bo_check_in": {
+            "$ref": "#/components/parameters/BookingCheckIn"
+          },
+          "bo_check_out": {
+            "$ref": "#/components/parameters/BookingCheckOut"
+          },
+          "bo_status": {
+            "$ref": "#/components/parameters/BookingStatus"
+          },
+          "bo_number_of_guests": {
+            "$ref": "#/components/parameters/BookingGuest"
+          },
+          "bo_number_of_children": {
+            "$ref": "#/components/parameters/BookingChildren"
+          },
+          "bo_ro_id": {
+            "$ref": "#/components/parameters/BookingRoomId"
+          },
+          "Guest": {
+            "$ref": "#/components/schemas/Guest"
+          }
+        }
+      },
+      "Guest": {
+        "type": "object",
+        "description": "Таблица связывающая гостя с справочником",
+        "properties": {
+          "gu_id": {
+            "$ref": "#/components/parameters/GuestId"
+          },
+          "GuestGuide": {
+            "$ref": "#/components/schemas/GuestGuide"
+          }
+        }
+      },
+      "GuestGuide": {
+        "type": "object",
+        "description": "Информация о госте",
+        "properties": {
+          "gu_g_id": {
+            "$ref": "#/components/parameters/GuestGuideId"
+          },
+          "gu_g_phone": {
+            "$ref": "#/components/parameters/GuestGuidePhone"
+          },
+          "gu_g_email": {
+            "$ref": "#/components/parameters/GuestGuideEmail"
+          },
+          "gu_g_surname": {
+            "$ref": "#/components/parameters/GuestGuideSurname"
+          },
+          "gu_g_name": {
+            "$ref": "#/components/parameters/GuestGuideName"
+          },
+          "gu_g_middle_name": {
+            "$ref": "#/components/parameters/GuestGuideMiddleName"
+          },
+          "gu_g_birth_date": {
+            "$ref": "#/components/parameters/GuestGuideBirthDate"
+          }
+        }
+      },
+      "Checks": {
+        "type": "object",
+        "properties": {
+          "pay_id": {
+            "$ref": "#/components/parameters/PaymentId"
+          },
+          "pay_total": {
+            "$ref": "#/components/parameters/PaymentTotal"
+          },
+          "pay_method": {
+            "$ref": "#/components/parameters/PaymentMethod"
+          },
+          "pay_date": {
+            "$ref": "#/components/parameters/PaymentDate"
+          },
+          "pay_status": {
+            "$ref": "#/components/parameters/PaymentStatus"
+          },
+          "Guest": {
+            "$ref": "#/components/schemas/Guest"
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "xml": {
+          "name": "##default"
+        }
+      }
+    },
+    "parameters": {
+      "RoomId": {
+        "name": "room_ID",
+        "in": "path",
+        "description": "Идентификатор номера",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "example": 1
+        }
+      },
+      "RoomStatus": {
+        "name": "room_status",
+        "in": "query",
+        "description": "Статус номера",
+        "required": false,
+        "explode": true,
+        "schema": {
+          "type": "string",
+          "default": "Готов к заселению",
+          "enum": [
+            "Занят",
+            "Не готов к заселению",
+            "Готов к заселению"
+          ]
+        },
+        "example": "Готов к заселению"
+      },
+      "RoomCategory": {
+        "name": "room_category",
+        "in": "query",
+        "description": "Категория номера",
+        "required": false,
+        "explode": true,
+        "schema": {
+          "type": "string",
+          "default": "Эконом",
+          "enum": [
+            "Эконом",
+            "Эконом+",
+            "Люкс",
+            "Вип",
+            "Президентский"
+          ]
+        },
+        "example": "Эконом"
+      },
+      "RoomFloor": {
+        "name": "room_floor",
+        "in": "query",
+        "required": true,
+        "description": "Этаж гостиницы",
+        "schema": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 44
+        },
+        "example": "1"
+      },
+      "RoomImage": {
+        "name": "room_Image",
+        "in": "query",
+        "required": false,
+        "description": "Фотография номера",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "RoomCategoryId": {
+        "name": "Room Category Id",
+        "in": "query",
+        "required": true,
+        "description": "Уникальный идентификатор категории номера",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "example": 3
+      },
+      "HotelId": {
+        "name": "Hotel Id",
+        "in": "query",
+        "description": "Уникальный идентификатор гостиницы",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "example": 1
+      },
+      "RoomCategoryGuideId": {
+        "name": "Room Category Guide Id",
+        "in": "query",
+        "description": "Уникальный идентификатор справочника категории номера",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "example": 2
+      },
+      "RoomCategoryGuideName": {
+        "name": "Room Category Guide Name",
+        "in": "query",
+        "description": "Название категории",
+        "schema": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "example": "Эконом"
+      },
+      "RoomCategoryGuideCost": {
+        "name": "Room Category Guide Cost",
+        "in": "query",
+        "description": "Стоимость категории номера за ночь",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "example": 2000
+        }
+      },
+      "RoomCategoryGuideBeds": {
+        "name": "Room Category Guide Beds",
+        "in": "query",
+        "description": "Количество спальных мест",
+        "schema": {
+          "type": "number",
+          "example": 5
+        }
+      },
+      "RoomCategoryGuideDescription": {
+        "name": "Room Category Guide Description",
+        "in": "query",
+        "description": "Описание категории номера",
+        "schema": {
+          "type": "string",
+          "maxLength": 10000,
+          "example": "Очень уютный, есть фен"
+        }
+      },
+      "RoomCategoryGuideCount": {
+        "name": "Room Category Guide Count",
+        "in": "query",
+        "description": "Количество номеров данной категории",
+        "schema": {
+          "type": "number",
+          "example": 30
+        }
+      },
+      "GuestId": {
+        "name": "Guest Id",
+        "in": "query",
+        "description": "Уникальный идентификатор гостя",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "example": 55
+      },
+      "GuestGuideId": {
+        "name": "Guest Guide Id",
+        "in": "query",
+        "description": "Уникальный идентификатор справочника гостя",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "example": 55
+      },
+      "GuestGuidePhone": {
+        "name": "Guest Phone",
+        "in": "query",
+        "description": "Телефон гостя",
+        "schema": {
+          "type": "string",
+          "maxLength": 20,
+          "pattern": "^\\\\+?\\\\d{10,15}$"
+        },
+        "example": "+79857777777"
+      },
+      "GuestGuideEmail": {
+        "name": "Guest Email",
+        "in": "query",
+        "description": "Адрес электронной почты клиента",
+        "schema": {
+          "type": "string",
+          "maxLength": 100,
+          "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}$"
+        },
+        "example": "ivan.ivanov@example.com"
+      },
+      "GuestGuideSurname": {
+        "name": "Guest Surname",
+        "in": "query",
+        "description": "Фамилия гостя",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "example": "Иванов"
+      },
+      "GuestGuideName": {
+        "name": "Guest Name",
+        "in": "query",
+        "description": "Имя гостя",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "example": "Иван"
+      },
+      "GuestGuideMiddleName": {
+        "name": "Guest Middle Name",
+        "in": "query",
+        "description": "Отчество гостя",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "example": "Иванович"
+      },
+      "GuestGuideBirthDate": {
+        "name": "Guest Birth Date",
+        "in": "query",
+        "description": "Дата рождения гостя",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "example": "2002-07-08"
+      },
+      "BookingId": {
+        "name": "bo_id",
+        "in": "query",
+        "description": "Уникальный идентификатор бронирования",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "example": 5
+      },
+      "BookingDate": {
+        "name": "Booking Date",
+        "in": "query",
+        "description": "Дата бронирования",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "example": "2024-20-05"
+      },
+      "BookingCheckIn": {
+        "name": "Booking Check In",
+        "in": "query",
+        "description": "Дата заселения",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "example": "2024-27-05"
+      },
+      "BookingCheckOut": {
+        "name": "Booking Check Out",
+        "in": "query",
+        "description": "Дата выселения",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "example": "2024-02-06"
+      },
+      "BookingStatus": {
+        "name": "Booking Status",
+        "in": "query",
+        "description": "Статус бронирования",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "Подтверждено",
+            "Ожидается подтверждение",
+            "Отменено"
+          ]
+        },
+        "example": "Подтверждено"
+      },
+      "BookingGuest": {
+        "name": "Booking Number Of Guests",
+        "in": "query",
+        "description": "Количество гостей в рамках бронирования",
+        "schema": {
+          "type": "number"
+        },
+        "example": 2
+      },
+      "BookingChildren": {
+        "name": "Booking Number Of Children",
+        "in": "query",
+        "description": "Количество детей в рамках бронирования",
+        "schema": {
+          "type": "number"
+        },
+        "example": 1
+      },
+      "BookingRoomId": {
+        "name": "Booking Room Id",
+        "in": "query",
+        "description": "Идентификатор номера",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "example": 21
+      },
+      "PaymentId": {
+        "name": "Payment Id",
+        "in": "query",
+        "description": "Уникальный идентификатор счета",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "example": 12
+      },
+      "PaymentTotal": {
+        "name": "Payment Total",
+        "in": "query",
+        "description": "Сумма счета",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "example": 10000
+      },
+      "PaymentMethod": {
+        "name": "Payment Method",
+        "in": "query",
+        "description": "Метод оплаты",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "Банковская карта",
+            "Наличные",
+            "Криптокошелек"
+          ]
+        },
+        "example": "Банковская карта"
+      },
+      "PaymentDate": {
+        "name": "Payment Date",
+        "in": "query",
+        "description": "Дата оплаты",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "example": "2024-01-16T00:00:00+03:00"
+      },
+      "PaymentStatus": {
+        "name": "Payment Status",
+        "in": "query",
+        "description": "Статус оплаты",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "Оплачено",
+            "Ожидает оплаты",
+            "Отменено"
+          ]
+        },
+        "example": "Оплачено"
+      }
+    }
+  }
+}
